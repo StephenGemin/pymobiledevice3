@@ -52,7 +52,35 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 # Mapping of index options to import file names
 # key=module name, value=relative import to module cli group
 ClickGroup = collections.namedtuple("ClickGroup", "import_group short_help")
-ClickCommand = collections.namedtuple("ClickCommand", "name short_help")
+ClickCommand = collections.namedtuple("ClickCommand", "name")
+# Mapping of index options to import file names
+# CLI_GROUPS = {
+#     'activation': 'activation',
+#     'afc': 'afc',
+#     'amfi': 'amfi',
+#     'apps': 'apps',
+#     'backup2': 'backup',
+#     'bonjour': 'bonjour',
+#     'companion': 'companion_proxy',
+#     'crash': 'crash',
+#     'developer': 'developer',
+#     'diagnostics': 'diagnostics',
+#     'lockdown': 'lockdown',
+#     'mounter': 'mounter',
+#     'notification': 'notification',
+#     'pcap': 'pcap',
+#     'power-assertion': 'power_assertion',
+#     'processes': 'processes',
+#     'profile': 'profile',
+#     'provision': 'provision',
+#     'remote': 'remote',
+#     'restore': 'restore',
+#     'springboard': 'springboard',
+#     'syslog': 'syslog',
+#     'usbmux': 'usbmux',
+#     'webinspector': 'webinspector',
+#     'version': 'version',
+# }
 CLI_GROUPS = {
     'activation': ClickGroup('activation:activation', 'activation options'),
     'afc': ClickGroup('afc:afc', 'FileSystem utils'),
@@ -77,63 +105,69 @@ CLI_GROUPS = {
     'springboard': ClickGroup('springboard:springboard', 'springboard options'),
     'syslog': ClickGroup('syslog:syslog', 'syslog options'),
     'usbmux': ClickGroup('usbmux:usbmux_cli', 'usbmuxd options'),
-    # 'version': ClickCommand('version:version',
+    # 'version': ClickCommand('version:version'),
     'webinspector': ClickGroup('webinspector:webinspector', 'webinspector options')
 }
 
 def _get_module(name: str) -> types.ModuleType:
-    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name].import_group.split(":")[0]}')
+    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name]}')
 
+# def _get_module(name: str) -> types.ModuleType:
+#     return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name].import_group.split(":")[0]}')
 
-class Pmd3Cli(click.Group):
-    def __init__(self, **kwargs):
-        kwargs.pop("import_name")
-        super().__init__(**kwargs)
-    def list_commands(self, ctx: click.Context):
-        return CLI_GROUPS.keys()
-
-    def get_command(self, ctx: click.Context, name: str):
-        # breakpoint()
-        # print(name)
-        if name not in CLI_GROUPS.keys():
-            ctx.fail(f'No such command {name!r}.')
-        mod = _get_module(name)
-        command = mod.cli.get_command(ctx, name)
-        # breakpoint()
-        # Some cli groups have different names than the index
-        # if not command:
-        #     command_name = mod.cli.list_commands(ctx)[0]
-        #     command = mod.cli.get_command(ctx, command_name)
-        return command
 
 # class Pmd3Cli(click.Group):
-#     def __init__(self, import_name, **kwargs):
-#         self._import_name = import_name
-#         super().__init__(**kwargs)
-#
-#     @functools.cached_property
-#     def _impl(self):
-#         module, name = self._import_name.split(":", 1)
-#         return getattr(importlib.import_module(module), name)
-#
-#     def get_command(self, ctx: click.Context, cmd_name: str):
-#         return self._impl.get_command(ctx, cmd_name)
-#
+#     # def __init__(self, **kwargs):
+#     #     kwargs.pop("import_name")
+#     #     super().__init__(**kwargs)
 #     def list_commands(self, ctx: click.Context):
-#         return self._impl.list_commands(ctx)
+#         return CLI_GROUPS.keys()
 #
-#     # def invoke(self, ctx):
-#     #     return self._impl.invoke(ctx)
+#     def get_command(self, ctx: click.Context, name: str):
+#         # breakpoint()
+#         # print(name)
+#         if name not in CLI_GROUPS.keys():
+#             ctx.fail(f'No such command {name!r}.')
+#         mod = _get_module(name)
+#         command = mod.cli.get_command(ctx, name)
+#         # if name == "usbmux":
+#         #     breakpoint()
+#         # breakpoint()
+#         # Some cli groups have different names than the index
+#         if not command:
+#             command_name = mod.cli.list_commands(ctx)[0]
+#             command = mod.cli.get_command(ctx, command_name)
+#         return command
+
+class Pmd3Cli(click.Group):
+    def __init__(self, import_name, **kwargs):
+        self._import_name = import_name
+        super().__init__(**kwargs)
+
+    @functools.cached_property
+    def _module(self) -> types.ModuleType:
+        module, name = self._import_name.split(":", 1)
+        return getattr(importlib.import_module(module), name)
+
+    def get_command(self, ctx: click.Context, cmd_name: str):
+        return self._module.get_command(ctx, cmd_name)
+
+    def list_commands(self, ctx: click.Context):
+        return self._module.list_commands(ctx)
+
+    # def invoke(self, ctx):
+    #     return self._impl.invoke(ctx)
 
 @click.group(cls=click.Group, context_settings=CONTEXT_SETTINGS)
 def cli():
     pass
 
-
+# _CLI_PATH = "pymobiledevice3.cli"
 # def _create_new_group(entry_point: click.Group, module, group_func):
 #     entry_point.group(name=module,cls=Pmd3Cli, import_name=f"{_CLI_PATH}.{group_func}")
-#
-#
+
+
+# ATTEMPT 1, DO NOT USE
 # for k, v in CLI_GROUPS.items():
 #     _func_code = f'''
 # @{cli}.group(cls=Pmd3Cli, import_name=f"{_CLI_PATH}.{v}")
@@ -147,6 +181,8 @@ def cli():
 #     # func=_create_new_group(cli, k, v)
 #     # func.__doc__ = f"{k} options"
 #     # globals()[k] = func
+
+
 def _create_click_group(name, group):
     """
     Create click group dynamically
@@ -156,19 +192,41 @@ def _create_click_group(name, group):
     def restore():
         '''restore options'''
     """
-    _CLI_PATH = "pymobiledevice3.cli"
-    @cli.group(name=name, cls=Pmd3Cli, import_name=f'pymobiledevice3.cli.{group.import_group}', short_help=group.short_help)
+    # _CLI_PATH = "pymobiledevice3.cli"
+    @cli.group(cls=Pmd3Cli, import_name=f'pymobiledevice3.cli.{group.import_group}', name=name, short_help=group.short_help)
     def new_group():
         pass
     return new_group
+
+# def _create_click_group(name, group):
+#     """
+#     Create click group dynamically
+#
+#     Replaces the need to do the following for each subgroup
+#     @cli.group(cls=Pmd3Cli, import_name=f"{_CLI_PATH}.{CLI_GROUPS['restore']}")
+#     def restore():
+#         '''restore options'''
+#     """
+#     _CLI_PATH = "pymobiledevice3.cli"
+#     @cli.group(name=name, cls=Pmd3Cli)
+#     def new_group():
+#         pass
+#     return new_group
 
 for _k, _v in CLI_GROUPS.items():
     # m, gfunc = _v.import_group.split(":", 1)
     # mod = importlib.import_module(f"pymobiledevice3.cli.{m}")
     # breakpoint()
     # group_func = _create_click_group(_k, _v, getattr(mod, gfunc).__doc__)
-    group_func = _create_click_group(_k, _v)
-    globals()[_k] = group_func
+    # breakpoint()
+    if isinstance(_v, ClickGroup):
+        group_func = _create_click_group(_k, _v)
+        globals()[_k] = group_func
+    else:
+        group_func = _create_click_group(_k, _v)
+        globals()[_k] = group_func
+    #     module, name = _v.name
+    #     cli.add_command(_get_module(module), name)
 
 # def _get_cli_modules():
 
