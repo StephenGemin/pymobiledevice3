@@ -46,6 +46,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -U '.[test]'
           #python -m pip install -U 'git+https://github.com/fmoo/python-editor@master'
-          pip install -U 'setuptools==60.*'
+          pip install -U 'setuptools==66.0.*'
       - name: Test show usage
         run: pytest -m cli
