@@ -7,6 +7,7 @@ import traceback
 import types
 import functools
 import typing
+from dataclasses import dataclass
 
 import click
 import coloredlogs
@@ -53,7 +54,7 @@ CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 # Mapping of index options to import file names
 # key=module name, value=relative import to module cli group
 ClickGroup = collections.namedtuple("ClickGroup", "import_group short_help")
-ClickCommand = collections.namedtuple("ClickCommand", "name")
+ClickCommand = collections.namedtuple("ClickCommand", "import_group")
 # Mapping of index options to import file names
 # CLI_GROUPS = {
 #     'activation': 'activation',
@@ -96,8 +97,8 @@ CLI_GROUPS = {
     'lockdown': ClickGroup('lockdown:lockdown_group', 'lockdown options'),
     'mounter': ClickGroup('mounter:mounter', 'mounter options'),
     'notification': ClickGroup('notification:notification', 'notification options'),
-    # 'pcap': 'pcap',
-    # 'power-assertion': 'power_assertion',
+    'pcap': ClickCommand('pcap:pcap'),
+    'power-assertion': ClickCommand('power_assertion:power_assertion'),
     'processes': ClickGroup('processes:processes', 'processes cli'),
     'profile': ClickGroup('profile:profile_group', 'foo'),
     'provision': ClickGroup('provision:provision', 'provision options'),
@@ -106,15 +107,15 @@ CLI_GROUPS = {
     'springboard': ClickGroup('springboard:springboard', 'springboard options'),
     'syslog': ClickGroup('syslog:syslog', 'syslog options'),
     'usbmux': ClickGroup('usbmux:usbmux_cli', 'usbmuxd options'),
-    # 'version': ClickCommand('version:version'),
+    'version': ClickCommand('version:version'),
     'webinspector': ClickGroup('webinspector:webinspector', 'webinspector options')
 }
 
 # def _get_module(name: str) -> types.ModuleType:
 #     return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name]}')
 
-def _get_module(name: str) -> types.ModuleType:
-    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name].import_group.split(":")[0]}')
+def _get_cli_module(key: str) -> types.ModuleType:
+    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[key].import_group.split(":")[0]}')
 
 
 # class Pmd3Cli(click.Group):
@@ -228,10 +229,11 @@ for _k, _v in CLI_GROUPS.items():
     # breakpoint()
     if isinstance(_v, ClickGroup):
         group_func = _create_click_group(_k, _v)
-        globals()[_k] = group_func
+        # globals()[_k] = group_func
     else:
-        group_func = _create_click_group(_k, _v)
-        globals()[_k] = group_func
+        _, name = _v.import_group.split(":", 1)
+        cli.add_command(getattr(_get_cli_module(_k), name))
+        # globals()[_k] = group_func
     #     module, name = _v.name
     #     cli.add_command(_get_module(module), name)
 
@@ -319,7 +321,11 @@ def main() -> None:
 
 def profile_command():
     # __main__._get_module("lockdown")
-    print(getattr(importlib.import_module('pymobiledevice3.cli.lockdown'), 'lockdown_group'))
+    # print(getattr(importlib.import_module('pymobiledevice3.cli.pcap'), "pcap"))
+    # print(getattr(importlib.import_module('pymobiledevice3.cli.power_assertion'), "power_assertion"))
+    cli(['pcap', '--help'])
+    # import subprocess
+    # subprocess.run("pymobiledevice3")
 
 if __name__ == '__main__':
     import cProfile
@@ -333,4 +339,4 @@ if __name__ == '__main__':
     cProfile.run('profile_command()', 'profile_output')
     p = pstats.Stats('profile_output')
     p.sort_stats('cumulative').print_stats()  # Print top 10 results sorted by cumulative time
-    # p.sort_stats('tottime').print_stats()
+    # p.sort_stats('tottime').print_stats(50)
