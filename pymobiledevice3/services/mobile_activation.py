@@ -6,7 +6,7 @@ from contextlib import closing
 from pathlib import Path
 from typing import List, Mapping
 
-import click
+import rich_click as click
 import inquirer3
 import requests
 

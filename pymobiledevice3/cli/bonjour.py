@@ -2,7 +2,7 @@ import asyncio
 import plistlib
 from pathlib import Path
 
-import click
+import rich_click as click
 
 from pymobiledevice3.bonjour import DEFAULT_BONJOUR_TIMEOUT, browse_remotepairing, browse_remotepairing_manual_pairing
 from pymobiledevice3.cli.cli_common import BaseCommand, print_json

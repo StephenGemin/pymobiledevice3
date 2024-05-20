@@ -1,6 +1,6 @@
 import logging
 
-import click
+import rich_click as click
 from tqdm import tqdm
 
 from pymobiledevice3.cli.cli_common import Command

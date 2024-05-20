@@ -2,7 +2,7 @@ import asyncio
 import logging
 import plistlib
 
-import click
+import rich_click as click
 
 from pymobiledevice3.cli.cli_common import Command, CommandWithoutAutopair, print_json, sudo_required
 from pymobiledevice3.cli.remote import tunnel_task

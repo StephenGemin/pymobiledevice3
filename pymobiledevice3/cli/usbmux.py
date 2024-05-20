@@ -1,7 +1,7 @@
 import logging
 import tempfile
 
-import click
+import rich_click as click
 
 from pymobiledevice3 import usbmux
 from pymobiledevice3.cli.cli_common import USBMUX_OPTION_HELP, BaseCommand, print_json

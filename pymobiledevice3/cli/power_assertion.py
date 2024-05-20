@@ -1,6 +1,6 @@
 import time
 
-import click
+import rich_click as click
 
 from pymobiledevice3.cli.cli_common import Command
 from pymobiledevice3.lockdown import LockdownClient

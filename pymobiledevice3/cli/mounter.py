@@ -3,7 +3,7 @@ from functools import update_wrapper
 from pathlib import Path
 from urllib.error import URLError
 
-import click
+import rich_click as click
 
 from pymobiledevice3.cli.cli_common import Command, print_json
 from pymobiledevice3.exceptions import AlreadyMountedError, DeveloperDiskImageNotFoundError, NotMountedError, \

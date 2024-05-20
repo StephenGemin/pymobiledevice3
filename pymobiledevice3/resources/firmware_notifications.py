@@ -3,7 +3,7 @@ import os
 import plistlib
 from typing import List
 
-import click
+import rich_click as click
 import coloredlogs
 
 NOTIFICATIONS_FILENAME = os.path.join(os.path.dirname(__file__), 'notifications.txt')

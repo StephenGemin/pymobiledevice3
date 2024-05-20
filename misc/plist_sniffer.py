@@ -3,7 +3,7 @@ import pprint
 import xml
 from typing import IO, Optional
 
-import click
+import rich_click as click
 from scapy.packet import Packet, Raw
 from scapy.sendrecv import sniff
 

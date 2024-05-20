@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import IO, Optional
 
-import click
+import rich_click as click
 from pygments import formatters, highlight, lexers
 
 from pymobiledevice3.cli.cli_common import Command, print_hex, user_requested_colored_output

@@ -3,7 +3,7 @@ import logging
 import os.path
 from uuid import UUID
 
-import click
+import rich_click as click
 import coloredlogs
 
 coloredlogs.install(level=logging.DEBUG)

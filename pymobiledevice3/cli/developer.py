@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-import click
+import rich_click as click
 from click.exceptions import MissingParameter, UsageError
 from packaging.version import Version
 from pykdebugparser.pykdebugparser import PyKdebugParser

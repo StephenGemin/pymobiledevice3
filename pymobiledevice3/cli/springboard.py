@@ -1,4 +1,4 @@
-import click
+import rich_click as click
 # import IPython
 
 from pymobiledevice3.cli.cli_common import Command, print_json

@@ -3,7 +3,7 @@ import os
 import posixpath
 import re
 
-import click
+import rich_click as click
 
 from pymobiledevice3.cli.cli_common import Command, get_last_used_terminal_formatting, user_requested_colored_output
 from pymobiledevice3.lockdown import LockdownClient

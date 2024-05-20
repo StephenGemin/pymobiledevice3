@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from functools import update_wrapper
 from typing import Iterable, List, Optional, Type
 
-import click
+import rich_click as click
 import inquirer3
 # import IPython
 import uvicorn

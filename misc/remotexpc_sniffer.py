@@ -2,7 +2,7 @@ import logging
 from pprint import pformat
 from typing import List, MutableMapping, Optional
 
-import click
+import rich_click as click
 import coloredlogs
 from construct import ConstError, StreamError
 from hexdump import hexdump

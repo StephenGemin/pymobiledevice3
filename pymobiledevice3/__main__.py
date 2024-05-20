@@ -9,7 +9,7 @@ import functools
 import typing
 from dataclasses import dataclass
 
-import click
+import rich_click as click
 import coloredlogs
 
 from pymobiledevice3.exceptions import AccessDeniedError, ConnectionFailedToUsbmuxdError, DeprecationError, \
@@ -19,6 +19,14 @@ from pymobiledevice3.exceptions import AccessDeniedError, ConnectionFailedToUsbm
     PairingDialogResponsePendingError, PasswordRequiredError, RSDRequiredError, SetProhibitedError, \
     TunneldConnectionError, UserDeniedPairingError
 from pymobiledevice3.osu.os_utils import get_os_utils
+
+click.rich_click.USE_RICH_MARKUP = False
+click.rich_click.USE_MARKDOWN = False
+click.rich_click.SHOW_ARGUMENTS = True
+click.rich_click.SHOW_METAVARS_COLUMN = True
+click.rich_click.APPEND_METAVARS_HELP = False
+click.rich_click.OPTION_ENVVAR_FIRST = False
+# click.rich_click.USE_CLICK_SHORT_HELP = True
 
 coloredlogs.install(level=logging.INFO)
 
@@ -141,7 +149,7 @@ def _get_cli_module(key: str) -> types.ModuleType:
 #             command = mod.cli.get_command(ctx, command_name)
 #         return command
 
-class Pmd3Cli(click.Group):
+class Pmd3Cli(click.RichGroup):
     def __init__(self, import_name, **kwargs):
         self._import_name = import_name
         super().__init__(**kwargs)
@@ -150,13 +158,13 @@ class Pmd3Cli(click.Group):
     # @property
     def _impg(self) -> click.Group:
         module, name = self._import_name.split(":", 1)
-        print(f'{module=}, {name=}')
+        # print(f'{module=}, {name=}')
         s = time.perf_counter()
         _attr = getattr(importlib.import_module(module), name)
         e = time.perf_counter()
-        print(e - s)
+        # print(e - s)
         _attr = getattr(importlib.import_module(module), name)
-        print(time.perf_counter() - e)
+        # print(time.perf_counter() - e)
 
         return _attr
 
@@ -167,7 +175,7 @@ class Pmd3Cli(click.Group):
         return self._impg.list_commands(ctx)
 
 
-@click.group(cls=click.Group, context_settings=CONTEXT_SETTINGS)
+@click.group(cls=click.RichGroup, context_settings=CONTEXT_SETTINGS)
 def cli():
     pass
 

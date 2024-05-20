@@ -4,7 +4,7 @@ import plistlib
 import traceback
 from zipfile import ZipFile
 
-import click
+import rich_click as click
 # import IPython
 from pygments import formatters, highlight, lexers
 from remotezip import RemoteZip

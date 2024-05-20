@@ -6,11 +6,10 @@ import uuid
 from functools import wraps
 from typing import Callable, List, Mapping, Optional, Tuple
 
-import click
+import rich_click as click
 import coloredlogs
 import hexdump
 import inquirer3
-from click import Option, UsageError
 from inquirer3.themes import GreenPassion
 from pygments import formatters, highlight, lexers
 
@@ -29,7 +28,7 @@ UDID_ENV_VAR = 'PYMOBILEDEVICE3_UDID'
 OSUTILS = get_os_utils()
 
 
-class RSDOption(Option):
+class RSDOption(click.Option):
     def __init__(self, *args, **kwargs):
         self.mutually_exclusive = set(kwargs.pop('mutually_exclusive', []))
         help = kwargs.get('help', '')
@@ -47,7 +46,7 @@ class RSDOption(Option):
             # defaulting to `--tunnel ''` if no remote option was specified
             opts['rsd_service_provider_using_tunneld'] = ''
         if self.mutually_exclusive.intersection(opts) and self.name in opts:
-            raise UsageError(
+            raise click.UsageError(
                 'Illegal usage: `{}` is mutually exclusive with '
                 'arguments `{}`.'.format(
                     self.name,
@@ -148,7 +147,7 @@ def choose_service_provider(callback: Callable):
     return wrap_callback_calling
 
 
-class BaseCommand(click.Command):
+class BaseCommand(click.RichCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.params[:0] = [
