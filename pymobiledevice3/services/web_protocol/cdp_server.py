@@ -2,8 +2,8 @@ import asyncio
 import uuid
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, WebSocket
-from fastapi.logger import logger
+# from fastapi import FastAPI, WebSocket
+# from fastapi.logger import logger
 
 from pymobiledevice3.services.web_protocol.cdp_target import CdpTarget
 from pymobiledevice3.services.web_protocol.session_protocol import SessionProtocol

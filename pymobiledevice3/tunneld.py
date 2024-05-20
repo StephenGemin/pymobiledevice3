@@ -9,10 +9,10 @@ from contextlib import asynccontextmanager, suppress
 from typing import Dict, List, Mapping, Optional, Tuple, Union
 
 import construct
-import fastapi
+# import fastapi
 import requests
 import uvicorn
-from fastapi import FastAPI
+# from fastapi import FastAPI
 from packaging.version import Version
 
 from pymobiledevice3 import usbmux
@@ -343,24 +343,24 @@ class TunneldRunner:
             return tunnels
 
         @self._app.get('/shutdown')
-        async def shutdown() -> fastapi.Response:
+        async def shutdown():
             """ Shutdown Tunneld """
             os.kill(os.getpid(), signal.SIGINT)
             return fastapi.Response(status_code=200, content='Server shutting down...')
 
         @self._app.get('/clear_tunnels')
-        async def clear_tunnels() -> fastapi.Response:
+        async def clear_tunnels():
             self._tunneld_core.clear()
             return fastapi.Response(status_code=200, content='Cleared tunnels...')
 
-        def generate_tunnel_response(tunnel: TunnelResult) -> fastapi.Response:
+        def generate_tunnel_response(tunnel: TunnelResult):
             return fastapi.Response(
                 status_code=200,
                 content=json.dumps({'interface': tunnel.interface, 'port': tunnel.port, 'address': tunnel.address}))
 
         @self._app.get('/start-tunnel')
         async def start_tunnel(
-                udid: str, ip: Optional[str] = None, connection_type: Optional[str] = None) -> fastapi.Response:
+                udid: str, ip: Optional[str] = None, connection_type: Optional[str] = None):
             udid_tunnels = [t.tunnel for t in self._tunneld_core.tunnel_tasks.values() if t.udid == udid]
             if len(udid_tunnels) > 0:
                 return generate_tunnel_response(udid_tunnels[0])
