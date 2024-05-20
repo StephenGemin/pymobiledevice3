@@ -8,7 +8,7 @@ from typing import Iterable, List, Optional, Type
 
 import click
 import inquirer3
-import IPython
+# import IPython
 import uvicorn
 from inquirer3.themes import GreenPassion
 from prompt_toolkit import HTML, PromptSession

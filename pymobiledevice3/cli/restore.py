@@ -5,7 +5,7 @@ import traceback
 from zipfile import ZipFile
 
 import click
-import IPython
+# import IPython
 from pygments import formatters, highlight, lexers
 from remotezip import RemoteZip
 

@@ -3,7 +3,7 @@ import sys
 from asyncio import IncompleteReadError
 from typing import Generator, Mapping, Optional, Tuple
 
-import IPython
+# import IPython
 import nest_asyncio
 from construct import StreamError
 from hyperframe.frame import DataFrame, Frame, GoAwayFrame, HeadersFrame, RstStreamFrame, SettingsFrame, \

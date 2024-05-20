@@ -1,5 +1,5 @@
 import click
-import IPython
+# import IPython
 
 from pymobiledevice3.cli.cli_common import Command, print_json
 from pymobiledevice3.lockdown import LockdownClient

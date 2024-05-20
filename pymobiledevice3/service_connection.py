@@ -8,7 +8,7 @@ import time
 from enum import Enum
 from typing import Any, Mapping, Optional
 
-import IPython
+# import IPython
 from pygments import formatters, highlight, lexers
 
 from pymobiledevice3.exceptions import ConnectionFailedError, ConnectionTerminatedError, NoDeviceConnectedError, \
