@@ -2,6 +2,7 @@ import collections
 import importlib
 import logging
 import sys
+import time
 import traceback
 import types
 import functools
@@ -109,11 +110,11 @@ CLI_GROUPS = {
     'webinspector': ClickGroup('webinspector:webinspector', 'webinspector options')
 }
 
-def _get_module(name: str) -> types.ModuleType:
-    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name]}')
-
 # def _get_module(name: str) -> types.ModuleType:
-#     return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name].import_group.split(":")[0]}')
+#     return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name]}')
+
+def _get_module(name: str) -> types.ModuleType:
+    return importlib.import_module(f'pymobiledevice3.cli.{CLI_GROUPS[name].import_group.split(":")[0]}')
 
 
 # class Pmd3Cli(click.Group):
@@ -145,18 +146,25 @@ class Pmd3Cli(click.Group):
         super().__init__(**kwargs)
 
     @functools.cached_property
-    def _module(self) -> types.ModuleType:
+    # @property
+    def _impg(self) -> click.Group:
         module, name = self._import_name.split(":", 1)
-        return getattr(importlib.import_module(module), name)
+        print(f'{module=}, {name=}')
+        s = time.perf_counter()
+        _attr = getattr(importlib.import_module(module), name)
+        e = time.perf_counter()
+        print(e - s)
+        _attr = getattr(importlib.import_module(module), name)
+        print(time.perf_counter() - e)
+
+        return _attr
 
     def get_command(self, ctx: click.Context, cmd_name: str):
-        return self._module.get_command(ctx, cmd_name)
+        return self._impg.get_command(ctx, cmd_name)
 
     def list_commands(self, ctx: click.Context):
-        return self._module.list_commands(ctx)
+        return self._impg.list_commands(ctx)
 
-    # def invoke(self, ctx):
-    #     return self._impl.invoke(ctx)
 
 @click.group(cls=click.Group, context_settings=CONTEXT_SETTINGS)
 def cli():
@@ -187,12 +195,11 @@ def _create_click_group(name, group):
     """
     Create click group dynamically
 
-    Replaces the need to do the following for each subgroup
+    Replaces the need to do the following for each group
     @cli.group(cls=Pmd3Cli, import_name=f"{_CLI_PATH}.{CLI_GROUPS['restore']}")
     def restore():
         '''restore options'''
     """
-    # _CLI_PATH = "pymobiledevice3.cli"
     @cli.group(cls=Pmd3Cli, import_name=f'pymobiledevice3.cli.{group.import_group}', name=name, short_help=group.short_help)
     def new_group():
         pass
@@ -310,5 +317,20 @@ def main() -> None:
             f'https://github.com/doronz88/pymobiledevice3.')
 
 
+def profile_command():
+    # __main__._get_module("lockdown")
+    print(getattr(importlib.import_module('pymobiledevice3.cli.lockdown'), 'lockdown_group'))
+
 if __name__ == '__main__':
-    main()
+    import cProfile
+    import importlib
+    import pstats
+    import time
+
+    # s = time.perf_counter()
+    # profile_command()
+    # print(time.perf_counter() - s)
+    cProfile.run('profile_command()', 'profile_output')
+    p = pstats.Stats('profile_output')
+    p.sort_stats('cumulative').print_stats()  # Print top 10 results sorted by cumulative time
+    # p.sort_stats('tottime').print_stats()
