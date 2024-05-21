@@ -348,3 +348,6 @@ if __name__ == '__main__':
     p = pstats.Stats('profile_output')
     p.sort_stats('cumulative').print_stats()  # Print top 10 results sorted by cumulative time
     # p.sort_stats('tottime').print_stats(50)
+    from timeit import timeit
+    print(timeit(stmt = "subprocess.run('pymobiledevice3', stdout=subprocess.DEVNULL)", setup = "import subprocess", number = 20))
+    print(timeit(stmt = "subprocess.run(['pymobiledevice3', 'lockdown'], stdout=subprocess.DEVNULL)", setup = "import subprocess", number = 20))
