@@ -8,7 +8,7 @@ from pymobiledevice3.lockdown import LockdownClient, create_using_usbmux
 from pymobiledevice3.lockdown_service_provider import LockdownServiceProvider
 from pymobiledevice3.remote.remote_service_discovery import RemoteServiceDiscoveryService
 from pymobiledevice3.services.dvt.dvt_secure_socket_proxy import DvtSecureSocketProxyService
-from pymobiledevice3.tunneld import async_get_tunneld_devices
+from pymobiledevice3.tunneld import async_get_tunneld_device_by_udid, async_get_tunneld_devices
 
 logging.getLogger('quic').disabled = True
 logging.getLogger('asyncio').disabled = True
@@ -51,16 +51,17 @@ async def service_provider(rsd_option, tunnel_option) -> LockdownServiceProvider
         async with RemoteServiceDiscoveryService(rsd_option) as rsd:
             yield rsd
     elif tunnel_option is not None:
-        rsds = await async_get_tunneld_devices()
-        try:
-            if tunnel_option == '':
-                yield rsds[0]
-            else:
-                yield [rsd for rsd in rsds if rsd.udid == tunnel_option][0]
-            for rsd in rsds:
-                await rsd.close()
-        except IndexError:
+        if tunnel_option == '':
+            rsds = await async_get_tunneld_devices()
+        else:
+            rsds = await async_get_tunneld_device_by_udid(tunnel_option)
+
+        if not rsds:
             raise DeviceNotFoundError(tunnel_option)
+
+        yield rsds[0]
+        for rsd in rsds:
+            await rsd.close()
     else:
         with create_using_usbmux() as client:
             yield client
