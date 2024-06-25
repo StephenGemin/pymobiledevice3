@@ -36,7 +36,6 @@ class RemoteServiceDiscoveryService(LockdownServiceProvider):
         self.peer_info: Optional[Mapping] = None
         self.lockdown: Optional[LockdownClient] = None
         self.all_values: Optional[Mapping] = None
-        self._loop: Optional[asyncio.AbstractEventLoop] = None
 
     @property
     def product_version(self) -> str:
@@ -132,11 +131,10 @@ class RemoteServiceDiscoveryService(LockdownServiceProvider):
         await self.close()
 
     def __enter__(self) -> 'RemoteServiceDiscoveryService':
-        self._loop = asyncio.get_event_loop()
-        return self._loop.run_until_complete(self.__aenter__())
+        return asyncio.get_event_loop().run_until_complete(self.__aenter__())
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        self._loop.run_until_complete(self.__aexit__(exc_type, exc_val, exc_tb))
+        asyncio.get_event_loop().run_until_complete(self.__aexit__(exc_type, exc_val, exc_tb))
 
     def __repr__(self) -> str:
         name_str = ''
